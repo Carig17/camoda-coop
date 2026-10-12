@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calmoda Coop - Calbayog Fare System</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Inter & Outfit -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            coop: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+              800: '#166534',
+              900: '#14532d',
+              dark: '#064e3b'
+            },
+            amberAccent: '#f59e0b',
+            tealAccent: '#0d9488'
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8fafc;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .font-display {
+      font-family: 'Outfit', sans-serif;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.8; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.03); }
+    }
+    .animate-glow {
+      animation: pulseGlow 3s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="text-slate-800 bg-slate-50 min-h-screen flex flex-col justify-between selection:bg-coop-500 selection:text-white">
+
+  <!-- HEADER & NAVBAR -->
+  <header class="bg-gradient-to-r from-coop-900 via-coop-800 to-teal-800 text-white shadow-lg sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 py-3 sm:px-6 flex items-center justify-between">
+      
+      <!-- Brand Logo & Title -->
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20 shadow-inner">
+          <i class="fa-solid fa-bus text-amber-400 text-xl sm:text-2xl"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-display font-extrabold text-lg sm:text-2xl tracking-tight text-white leading-none">
+              CALMODA <span class="text-amber-400">COOP</span>
+            </h1>
+            <span class="bg-amber-400/20 text-amber-300 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-amber-400/30">Calbayog</span>
+          </div>
+          <p class="text-xs text-emerald-100 font-medium tracking-wide mt-0.5 flex items-center gap-1">
+            <i class="fa-solid fa-route text-amber-300 text-[10px]"></i>
+            <span>Brgy. Malayog ↔ Calbayog City Proper</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-2">
+        <!-- Local Sync Indicator -->
+        <button id="offlineStatusBtn" onclick="toggleOfflineModal()" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-emerald-700/60 hover:bg-emerald-700 text-xs font-medium rounded-xl border border-emerald-500/40 transition">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span class="w-2 h-2 rounded-full bg-emerald-400 -ml-3.5"></span>
+          <span id="syncText">Taripa Cached</span>
+        </button>
+
+        <!-- Driver Verify Trigger -->
+        <button onclick="openVerifyModal()" class="bg-amber-500 hover:bg-amber-600 active:scale-95 text-coop-900 font-semibold px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs sm:text-sm shadow-md transition flex items-center gap-1.5">
+          <i class="fa-solid fa-qrcode"></i>
+          <span class="hidden sm:inline">Verify Driver</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ANNOUNCEMENTS TICKER -->
+  <div class="bg-amber-500/10 border-b border-amber-500/20 text-amber-900 px-4 py-2 text-xs sm:text-sm">
+    <div class="max-w-6xl mx-auto flex items-center justify-between gap-2 overflow-hidden">
+      <div class="flex items-center gap-2 font-semibold text-amber-700 shrink-0">
+        <span class="bg-amber-500 text-white text-[10px] uppercase font-bold px-1.5 py-0.5 rounded">PAHINUMDOM</span>
+      </div>
+      <div class="truncate text-slate-700">
+        <span id="tickerText" class="inline-block transition-opacity duration-500">
+          📍 Opisyal na Taripa sanglit sa LGU Calbayog at LTFRB Region VIII. Siguraduhing sakto ang ibinabayad na pasahe.
+        </span>
+      </div>
+      <button onclick="nextTickerNotice()" class="shrink-0 text-amber-800 hover:text-amber-950 px-1">
+        <i class="fa-solid fa-angle-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-6xl mx-auto px-4 py-6 sm:px-6 grow w-full space-y-6">
+
+    <!-- FARE CALCULATOR CARD -->
+    <section class="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+      
+      <!-- Card Header -->
+      <div class="bg-gradient-to-r from-coop-800 to-coop-700 px-6 py-4 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h2 class="font-display text-xl sm:text-2xl font-bold flex items-center gap-2">
+            <i class="fa-solid fa-calculator text-amber-400"></i>
+            Kalkulador sa Pasahe (Fare Calculator)
+          </h2>
+          <p class="text-xs text-emerald-100 mt-0.5">Kwentahin ang tamang pasahe at distansya mula sa iyong pinanggalingan hanggang destinasyon.</p>
+        </div>
+        
+        <!-- Quick Swap Origin/Dest -->
+        <button onclick="swapLocations()" class="self-start sm:self-center bg-white/10 hover:bg-white/20 active:scale-95 text-emerald-100 px-3 py-1.5 rounded-xl text-xs font-medium border border-white/20 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-arrow-right-arrow-left"></i>
+          <span>Pagpalitin (Swap)</span>
+        </button>
+      </div>
+
+      <div class="p-5 sm:p-7 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- CONTROLS COLUMN (7 cols) -->
+        <div class="lg:col-span-7 space-y-5">
+          
+          <!-- Origin & Destination Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Origin Select -->
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+                <i class="fa-solid fa-circle-dot text-emerald-600 text-[10px]"></i>
+                Gikan (Origin / Mula)
+              </label>
+              <div class="relative">
+                <select id="originSelect" onchange="calculateFare()" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-3 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-coop-500 focus:bg-white transition appearance-none">
+                  <!-- JS Populated -->
+                </select>
+                <i class="fa-solid fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xs"></i>
+              </div>
+            </div>
+
+            <!-- Destination Select -->
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+                <i class="fa-solid fa-location-dot text-rose-500 text-[10px]"></i>
+                Kadtuan (Destination / Papunta)
+              </label>
+              <div class="relative">
+                <select id="destinationSelect" onchange="calculateFare()" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-3 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-coop-500 focus:bg-white transition appearance-none">
+                  <!-- JS Populated -->
+                </select>
+                <i class="fa-solid fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xs"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Vehicle Type Selector -->
+          <div>
+            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
+              Klase sa Sarakyan (Vehicle Type)
+            </label>
+            <div class="grid grid-cols-3 gap-2 sm:gap-3" id="vehicleContainer">
+              <!-- Tricycle -->
+              <button type="button" data-vehicle="tricycle" onclick="setVehicle('tricycle')" class="vehicle-btn border-2 border-coop-600 bg-coop-50 text-coop-900 rounded-2xl p-3 flex flex-col items-center justify-center gap-1 text-center transition hover:border-coop-600">
+                <i class="fa-solid fa-motorcycle text-xl text-coop-700"></i>
+                <span class="text-xs font-bold leading-tight">Tricycle</span>
+                <span class="text-[10px] text-slate-500">Short/Local</span>
+              </button>
+
+              <!-- Multicab / PUJ -->
+              <button type="button" data-vehicle="puj" onclick="setVehicle('puj')" class="vehicle-btn border-2 border-slate-200 bg-slate-50 text-slate-700 rounded-2xl p-3 flex flex-col items-center justify-center gap-1 text-center transition hover:border-coop-400">
+                <i class="fa-solid fa-truck-pickup text-xl text-slate-600"></i>
+                <span class="text-xs font-bold leading-tight">Multicab / PUJ</span>
+                <span class="text-[10px] text-slate-500">Route Bus/Jeep</span>
+              </button>
+
+              <!-- Habal-Habal -->
+              <button type="button" data-vehicle="habal" onclick="setVehicle('habal')" class="vehicle-btn border-2 border-slate-200 bg-slate-50 text-slate-700 rounded-2xl p-3 flex flex-col items-center justify-center gap-1 text-center transition hover:border-coop-400">
+                <i class="fa-solid fa-person-biking text-xl text-slate-600"></i>
+                <span class="text-xs font-bold leading-tight">Habal-Habal</span>
+                <span class="text-[10px] text-slate-500">Express Solo</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Passenger Category & Discount Selector -->
+          <div>
+            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2 flex items-center justify-between">
+              <span>Kategorya san Pasahero (Passenger)</span>
+              <span class="text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded text-[10px] font-extrabold">20% Legal Discount</span>
+            </label>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="passengerTypeContainer">
+              <button type="button" data-ptype="regular" onclick="setPassengerType('regular')" class="ptype-btn border-2 border-coop-600 bg-coop-50 text-coop-900 rounded-xl p-2.5 text-xs font-semibold text-center transition">
+                Regular
+              </button>
+              <button type="button" data-ptype="student" onclick="setPassengerType('student')" class="ptype-btn border-2 border-slate-200 bg-slate-50 text-slate-700 rounded-xl p-2.5 text-xs font-semibold text-center transition">
+                Estudyante
+              </button>
+              <button type="button" data-ptype="senior" onclick="setPassengerType('senior')" class="ptype-btn border-2 border-slate-200 bg-slate-50 text-slate-700 rounded-xl p-2.5 text-xs font-semibold text-center transition">
+                Senior Citizen
+              </button>
+              <button type="button" data-ptype="pwd" onclick="setPassengerType('pwd')" class="ptype-btn border-2 border-slate-200 bg-slate-50 text-slate-700 rounded-xl p-2.5 text-xs font-semibold text-center transition">
+                PWD / Solo Parent
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RESULT DISPLAY COLUMN (5 cols) -->
+        <div class="lg:col-span-5 bg-gradient-to-br from-slate-900 via-coop-950 to-slate-900 text-white rounded-3xl p-6 flex flex-col justify-between shadow-inner relative overflow-hidden">
+          
+          <!-- Decorative Background Icon -->
+          <i class="fa-solid fa-receipt text-slate-800/40 text-9xl absolute -right-6 -bottom-6 pointer-events-none"></i>
+
+          <div class="relative z-10 space-y-4">
+            
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+              <span class="text-xs uppercase font-bold text-emerald-400 tracking-wider">Kabayaran (Calculated Fare)</span>
+              <span id="discountBadge" class="bg-amber-400 text-coop-950 text-[10px] font-black px-2 py-0.5 rounded-full uppercase hidden">
+                20% Off Applied
+              </span>
+            </div>
+
+            <!-- Huge Fare Amount -->
+            <div class="py-2">
+              <div class="text-slate-400 text-xs font-medium">Kagabsan nga Pasahe:</div>
+              <div class="flex items-baseline gap-1">
+                <span class="font-display font-extrabold text-5xl sm:text-6xl text-amber-400 tracking-tight" id="displayFare">₱0.00</span>
+                <span class="text-slate-400 text-xs font-medium" id="displayPerPax">/ pasahero</span>
+              </div>
+            </div>
+
+            <!-- Route Stats Badge -->
+            <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800/80">
+              <div class="bg-slate-800/60 backdrop-blur rounded-2xl p-3 border border-slate-700/50">
+                <div class="text-[10px] text-slate-400 uppercase font-semibold flex items-center gap-1">
+                  <i class="fa-solid fa-road text-amber-400"></i> Distansya
+                </div>
+                <div class="text-base font-bold text-white mt-0.5" id="displayDistance">0.0 km</div>
+              </div>
+
+              <div class="bg-slate-800/60 backdrop-blur rounded-2xl p-3 border border-slate-700/50">
+                <div class="text-[10px] text-slate-400 uppercase font-semibold flex items-center gap-1">
+                  <i class="fa-solid fa-clock text-amber-400"></i> Tinantyang Oras
+                </div>
+                <div class="text-base font-bold text-white mt-0.5" id="displayTime">0 min</div>
+              </div>
+            </div>
+
+            <!-- Breakdown -->
+            <div class="space-y-1.5 text-xs text-slate-300 pt-2">
+              <div class="flex justify-between">
+                <span class="text-slate-400">Pundasyon (Base Fare):</span>
+                <span id="displayBaseFare" class="font-medium text-slate-200">₱0.00</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">Kadasig sa Distansya Rate:</span>
+                <span id="displayDistanceRate" class="font-medium text-slate-200">₱0.00</span>
+              </div>
+              <div class="flex justify-between text-amber-300 font-semibold pt-1 border-t border-slate-800">
+                <span>Diskwento (Discount):</span>
+                <span id="displayDiscountAmount">-₱0.00</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Action Button inside display -->
+          <div class="relative z-10 pt-5">
+            <button onclick="openReportModal()" class="w-full bg-slate-800 hover:bg-slate-700 active:bg-slate-800 text-slate-200 py-2.5 px-4 rounded-xl text-xs font-semibold border border-slate-700 transition flex items-center justify-center gap-2">
+              <i class="fa-solid fa-circle-exclamation text-rose-400"></i>
+              <span>Mag-report san Overcharging o Reklamo</span>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- INTERACTIVE FARE MATRIX TABLE (TARIPA) -->
+    <section class="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+      
+      <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h3 class="font-display text-lg sm:text-xl font-bold text-slate-800 flex items-center gap-2">
+            <i class="fa-solid fa-table-list text-coop-600"></i>
+            Opisyal na Taripa sa Pasahe (Fare Matrix Table)
+          </h3>
+          <p class="text-xs text-slate-500 mt-0.5">Talaan ng standard fares para sa mga barangay sakop ng Calmoda Coop.</p>
+        </div>
+
+        <!-- Matrix Filters -->
+        <div class="flex flex-wrap items-center gap-2">
+          <!-- Search input -->
+          <div class="relative min-w-[180px]">
+            <input type="text" id="matrixSearch" onkeyup="filterMatrixTable()" placeholder="Maghanap ng Brgy..." class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-8 pr-3 py-1.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-coop-500">
+            <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+          </div>
+
+          <!-- Vehicle filter -->
+          <select id="matrixVehicleFilter" onchange="renderMatrixTable()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-coop-500">
+            <option value="tricycle">Tricycle Tariff</option>
+            <option value="puj">Multicab / PUJ Tariff</option>
+            <option value="habal">Habal-Habal Tariff</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Table Container -->
+      <div class="overflow-x-auto custom-scrollbar">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="bg-slate-100 text-slate-700 font-bold uppercase tracking-wider border-b border-slate-200">
+              <th class="p-3.5 pl-6">Mula (Origin)</th>
+              <th class="p-3.5">Papunta (Destination)</th>
+              <th class="p-3.5">Tantyang Distansya</th>
+              <th class="p-3.5">Regular Fare</th>
+              <th class="p-3.5 pr-6">Discounted Fare (20%)</th>
+            </tr>
+          </thead>
+          <tbody id="matrixTableBody" class="divide-y divide-slate-100 text-slate-700 font-medium">
+            <!-- JS Populated -->
+          </tbody>
+        </table>
+      </div>
+
+    </section>
+
+    <!-- HOTLINES & COOP INFORMATION GRID -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <!-- Emergency & Support Hotlines -->
+      <section class="bg-white rounded-3xl p-6 shadow-xl border border-slate-100 flex flex-col justify-between space-y-4">
+        <div>
+          <h3 class="font-display text-lg font-bold text-slate-800 flex items-center gap-2 mb-1">
+            <i class="fa-solid fa-phone-volume text-rose-500"></i>
+            Mga Numero para sa Saklolo at Reklamo
+          </h3>
+          <p class="text-xs text-slate-500">Direktang tawagan ang mga ahensya kung may emergency o mga paglabag sa kalye.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          
+          <!-- Calmoda Hotline -->
+          <a href="tel:09171234567" class="flex items-center gap-3 p-3 bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200/80 rounded-2xl transition group">
+            <div class="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+              <i class="fa-solid fa-headset text-sm"></i>
+            </div>
+            <div class="truncate">
+              <div class="text-xs font-bold text-emerald-950">Calmoda Coop Office</div>
+              <div class="text-[11px] font-semibold text-emerald-700">0917-123-4567</div>
+            </div>
+          </a>
+
+          <!-- Calbayog TMO -->
+          <a href="tel:09209876543" class="flex items-center gap-3 p-3 bg-amber-50 hover:bg-amber-100/80 border border-amber-200/80 rounded-2xl transition group">
+            <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+              <i class="fa-solid fa-traffic-light text-sm"></i>
+            </div>
+            <div class="truncate">
+              <div class="text-xs font-bold text-amber-950">Calbayog TMO</div>
+              <div class="text-[11px] font-semibold text-amber-700">0920-987-6543</div>
+            </div>
+          </a>
+
+          <!-- PNP Calbayog -->
+          <a href="tel:09112223333" class="flex items-center gap-3 p-3 bg-blue-50 hover:bg-blue-100/80 border border-blue-200/80 rounded-2xl transition group">
+            <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+              <i class="fa-solid fa-shield-halved text-sm"></i>
+            </div>
+            <div class="truncate">
+              <div class="text-xs font-bold text-blue-950">PNP Calbayog Station</div>
+              <div class="text-[11px] font-semibold text-blue-700">0911-222-3333</div>
+            </div>
+          </a>
+
+          <!-- CDRRMO Rescue -->
+          <a href="tel:09887776666" class="flex items-center gap-3 p-3 bg-rose-50 hover:bg-rose-100/80 border border-rose-200/80 rounded-2xl transition group">
+            <div class="w-9 h-9 rounded-xl bg-rose-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+              <i class="fa-solid fa-truck-medical text-sm"></i>
+            </div>
+            <div class="truncate">
+              <div class="text-xs font-bold text-rose-950">CDRRMO Rescue</div>
+              <div class="text-[11px] font-semibold text-rose-700">0988-777-6666</div>
+            </div>
+          </a>
+
+        </div>
+      </section>
+
+      <!-- Coop Guidelines & FAQs -->
+      <section class="bg-white rounded-3xl p-6 shadow-xl border border-slate-100 flex flex-col justify-between space-y-4">
+        <div>
+          <h3 class="font-display text-lg font-bold text-slate-800 flex items-center gap-2 mb-1">
+            <i class="fa-solid fa-circle-info text-teal-600"></i>
+            Karapatan ng Pasahero at Tuntunin
+          </h3>
+          <p class="text-xs text-slate-500">Maging reponsableng pasahero sa lungsod ng Calbayog.</p>
+        </div>
+
+        <ul class="space-y-2.5 text-xs text-slate-600">
+          <li class="flex items-start gap-2.5">
+            <i class="fa-solid fa-check-circle text-emerald-500 mt-0.5 shrink-0"></i>
+            <span><strong>Diskwento sa Pasahe:</strong> Laging ipakita ang Valid School ID, Senior Citizen ID, PWD ID, o Solo Parent ID bago magbayad.</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <i class="fa-solid fa-check-circle text-emerald-500 mt-0.5 shrink-0"></i>
+            <span><strong>Eskatong Barya:</strong> Kung maaari, mag-abot ng eksaktong barya para sa mas mabilis at ligtas na biyahe.</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <i class="fa-solid fa-check-circle text-emerald-500 mt-0.5 shrink-0"></i>
+            <span><strong>I-verify ang Driver:</strong> Gamitin ang aming QR Scan / Body Number Checker upang masigurong lisensyado at lehitimong miyembro ng Calmoda Coop ang sasakyan.</span>
+          </li>
+        </ul>
+
+        <div class="pt-2">
+          <button onclick="downloadTariffSummary()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-file-arrow-down"></i>
+            <span>I-download ang PDF/Text Copy ng Taripa</span>
+          </button>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-slate-900 text-slate-400 text-xs py-8 border-t border-slate-800 mt-12">
+    <div class="max-w-6xl mx-auto px-4 text-center space-y-3">
+      <div class="flex items-center justify-center gap-2 text-white font-display font-bold text-base">
+        <i class="fa-solid fa-bus text-amber-400"></i> Calmoda Transport Cooperative
+      </div>
+      <p class="max-w-md mx-auto text-slate-400 text-[11px]">
+        Inaprubahan ng City Transportation Office (CTO) - Calbayog City at LTFRB Region VIII.
+        Naglilingkod sa ruta ng Malayog, Tinambacan, San Joaquin, Dagum, Rawis, at City Proper.
+      </p>
+      <div class="text-[10px] text-slate-500 pt-2 border-t border-slate-800">
+        &copy; 2026 Calmoda Coop Fare Management System. Ready for Vercel Deployment.
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- MODAL 1: DRIVER VERIFICATION / QR SCANNER SIMULATOR -->
+  <div id="verifyModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative space-y-4 animate-in fade-in zoom-in duration-200">
+      
+      <!-- Close Button -->
+      <button onclick="closeVerifyModal()" class="absolute top-4 right-4 w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center justify-center text-slate-500 transition">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="text-center">
+        <div class="w-12 h-12 bg-coop-100 text-coop-700 rounded-2xl flex items-center justify-center mx-auto mb-2 text-2xl">
+          <i class="fa-solid fa-id-card"></i>
+        </div>
+        <h3 class="font-display font-bold text-lg text-slate-800">Verify Calmoda Driver</h3>
+        <p class="text-xs text-slate-500">I-type ang Body Number / Unit ID o mag-simula ng QR scan.</p>
+      </div>
+
+      <!-- Verification Input -->
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Calmoda Body # o Plate Number</label>
+          <div class="flex gap-2">
+            <input type="text" id="verifyInput" placeholder="Halimbawa: CMD-042" class="grow bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm font-semibold uppercase focus:outline-none focus:ring-2 focus:ring-coop-500">
+            <button onclick="verifyDriver()" class="bg-coop-600 hover:bg-coop-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition">
+              I-check
+            </button>
+          </div>
+        </div>
+
+        <div class="relative flex py-1 items-center">
+          <div class="grow border-t border-slate-200"></div>
+          <span class="shrink-0 mx-3 text-[10px] text-slate-400 uppercase font-bold">O kaya</span>
+          <div class="grow border-t border-slate-200"></div>
+        </div>
+
+        <!-- Simulated Camera Scan Area -->
+        <button onclick="simulateQRScan()" id="qrScanBtn" class="w-full bg-slate-900 hover:bg-slate-800 text-white py-3 rounded-2xl text-xs font-bold transition flex items-center justify-center gap-2 border border-slate-700">
+          <i class="fa-solid fa-camera text-amber-400"></i>
+          <span>I-simulate ang QR Code Scanner</span>
+        </button>
+      </div>
+
+      <!-- Result Card -->
+      <div id="verifyResult" class="hidden rounded-2xl p-4 text-xs space-y-2 border">
+        <!-- JS Inserted -->
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- MODAL 2: REPORT / INCIDENT COMPLAINT FORM -->
+  <div id="reportModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl relative space-y-4 max-h-[90vh] overflow-y-auto custom-scrollbar">
+      
+      <!-- Close Button -->
+      <button onclick="closeReportModal()" class="absolute top-4 right-4 w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center justify-center text-slate-500 transition">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div>
+        <div class="flex items-center gap-2 text-rose-600">
+          <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+          <h3 class="font-display font-bold text-lg text-slate-800">Ulat ng Overcharging / Reklamo</h3>
+        </div>
+        <p class="text-xs text-slate-500 mt-0.5">Ipadala ang opisyal na ulat sa Calmoda Coop Desk & Calbayog TMO.</p>
+      </div>
+
+      <form id="reportForm" onsubmit="submitReport(event)" class="space-y-3 text-xs">
+        
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Body # o Plate # *</label>
+            <input type="text" id="reportUnit" required placeholder="e.g. CMD-108 / 1234-SB" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-semibold focus:outline-none focus:ring-2 focus:ring-rose-500">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Uri ng Sasakyan</label>
+            <select id="reportVehicle" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-semibold focus:outline-none focus:ring-2 focus:ring-rose-500">
+              <option value="Tricycle">Tricycle</option>
+              <option value="Multicab / PUJ">Multicab / PUJ</option>
+              <option value="Habal-Habal">Habal-Habal</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Pinanggalingan / Lokasyon</label>
+            <input type="text" id="reportLocation" placeholder="e.g. Brgy. San Joaquin" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-semibold focus:outline-none focus:ring-2 focus:ring-rose-500">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Siningil na Halaga (₱)</label>
+            <input type="number" id="reportCharged" placeholder="e.g. 50" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-semibold focus:outline-none focus:ring-2 focus:ring-rose-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-600 mb-1">Detalye ng Pangyayari *</label>
+          <textarea id="reportDetails" rows="3" required placeholder="Isulat ang nangyari, oras ng biyahe, o kakaibang inasal ng driver..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-medium focus:outline-none focus:ring-2 focus:ring-rose-500"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Pangalan ng Complainant (Optional)</label>
+            <input type="text" id="reportName" placeholder="Juan Dela Cruz" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-medium focus:outline-none focus:ring-2 focus:ring-rose-500">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Contact Number (Optional)</label>
+            <input type="text" id="reportContact" placeholder="09123456789" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-medium focus:outline-none focus:ring-2 focus:ring-rose-500">
+          </div>
+        </div>
+
+        <div class="pt-2">
+          <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 rounded-2xl transition shadow-md">
+            I-submit ang Reklamo
+          </button>
+        </div>
+
+      </form>
+
+      <!-- Confirmation Toast inside Modal -->
+      <div id="reportSuccess" class="hidden bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-2xl p-4 text-xs space-y-2">
+        <div class="flex items-center gap-2 font-bold text-emerald-700 text-sm">
+          <i class="fa-solid fa-circle-check"></i>
+          <span>Matagumpay na Naitala ang Ulat!</span>
+        </div>
+        <p>Reference Code: <strong id="reportRefCode" class="text-slate-900 font-mono">CMD-2026-XXXX</strong></p>
+        <p class="text-[11px] text-emerald-800">Naipasa na ito sa ating system log. Maaari mong kopyahin ang reference code kung tatawag sa Hotline.</p>
+        <button onclick="copyRefCode()" class="bg-emerald-600 text-white px-3 py-1.5 rounded-xl font-bold hover:bg-emerald-700 transition">
+          <i class="fa-solid fa-copy mr-1"></i> Kopyahin ang Ref Code
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- MODAL 3: OFFLINE CACHE STATUS -->
+  <div id="offlineModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl text-center space-y-4">
+      <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto text-2xl">
+        <i class="fa-solid fa-floppy-disk"></i>
+      </div>
+      <h3 class="font-display font-bold text-lg text-slate-800">Offline Tariff Matrix Ready</h3>
+      <p class="text-xs text-slate-500 leading-relaxed">
+        Ang opisyal na Calbayog Fare System taripa ay nakatabi sa local storage ng iyong browser. Pwede mong gamitin ang app kahit walang Internet signal habang nagbibyahe mula Malayog papuntang City Proper.
+      </p>
+      <button onclick="closeOfflineModal()" class="w-full bg-slate-900 text-white font-bold py-2.5 rounded-2xl text-xs hover:bg-slate-800 transition">
+        Naiintindihan Ko
+      </button>
+    </div>
+  </div>
+
+
+  <script>
+    /* ==========================================================================
+       CALMODA COOP DATA & LOGIC SYSTEM
+       Route: Brgy. Malayog ↔ Calbayog City Proper
+       ========================================================================== */
+
+    // 1. BARANGAYS & LANDMARKS (WITH DISTANCES IN KM FROM MALAYOG BASELINE)
+    const LOCATIONS = [
+      { id: 'malayog', name: 'Brgy. Malayog', km: 0.0 },
+      { id: 'tinambacan_norte', name: 'Brgy. Tinambacan Norte', km: 3.2 },
+      { id: 'tinambacan_sur', name: 'Brgy. Tinambacan Sur', km: 5.5 },
+      { id: 'danao', name: 'Brgy. Danao', km: 8.4 },
+      { id: 'san_joaquin', name: 'Brgy. San Joaquin', km: 11.1 },
+      { id: 'dagum', name: 'Brgy. Dagum', km: 14.3 },
+      { id: 'rawis', name: 'Brgy. Rawis', km: 16.8 },
+      { id: 'city_proper', name: 'Calbayog City Proper (Nijaga Park / Market / Terminal)', km: 19.5 }
+    ];
+
+    // 2. FARE RATES CONFIGURATION (PHP)
+    const FARE_RATES = {
+      tricycle: { baseFare: 15.00, baseKm: 2.0, ratePerKm: 2.50, avgSpeedKmh: 30 },
+      puj: { baseFare: 13.00, baseKm: 4.0, ratePerKm: 1.80, avgSpeedKmh: 40 },
+      habal: { baseFare: 25.00, baseKm: 2.0, ratePerKm: 3.50, avgSpeedKmh: 45 }
+    };
+
+    // 3. MOCK DRIVERS DATABASE FOR QR/BODY# VERIFICATION
+    const MOCK_DRIVERS = [
+      { body: 'CMD-012', name: 'Danilo Mabini', unit: 'Tricycle (TVS King)', plate: '1234-HA', status: 'ACTIVE / VERIFIED', franchise: 'Valid until Dec 2027' },
+      { body: 'CMD-042', name: 'Rogelio "Jing" Serrano', unit: 'Multicab PUJ', plate: 'EV-8891', status: 'ACTIVE / VERIFIED', franchise: 'Valid until Oct 2028' },
+      { body: 'CMD-108', name: 'Mateo Doroja', unit: 'Habal-Habal (Yamaha)', plate: '9921-SB', status: 'ACTIVE / VERIFIED', franchise: 'Valid until Aug 2026' },
+      { body: 'CMD-215', name: 'Eddie Lucero', unit: 'Tricycle (Bajaj RE)', plate: '4410-XY', status: 'ACTIVE / VERIFIED', franchise: 'Valid until Jan 2027' }
+    ];
+
+    // 4. TICKER NOTICES
+    const TICKER_NOTICES = [
+      "📍 Opisyal na Taripa sanglit sa LGU Calbayog at LTFRB Region VIII. Siguraduhing sakto ang ibinabayad na pasahe.",
+      "⚠️ Inaalerto ang mga commuters: Laging tiyaking may ID para sa 20% Student/Senior/PWD discount.",
+      "📞 Para sa mga reklamo ukol sa overcharging, mangyaring gamitin ang Complaint Form o tumawag sa Calmoda Desk (0917-123-4567)."
+    ];
+    let currentTickerIdx = 0;
+
+    // STATE VARIABLES
+    let currentVehicle = 'tricycle';
+    let currentPassengerType = 'regular';
+
+    window.addEventListener('DOMContentLoaded', () => {
+      populateDropdowns();
+      setVehicle('tricycle');
+      setPassengerType('regular');
+      renderMatrixTable();
+      saveTariffToLocalStorage();
+    });
+
+    // POPULATE DROPDOWNS
+    function populateDropdowns() {
+      const originSelect = document.getElementById('originSelect');
+      const destSelect = document.getElementById('destinationSelect');
+
+      originSelect.innerHTML = '';
+      destSelect.innerHTML = '';
+
+      LOCATIONS.forEach((loc, index) => {
+        const opt1 = new Option(loc.name, loc.id);
+        const opt2 = new Option(loc.name, loc.id);
+
+        originSelect.add(opt1);
+        destSelect.add(opt2);
+      });
+
+      // Default Origin: Malayog, Default Dest: City Proper
+      originSelect.selectedIndex = 0;
+      destSelect.selectedIndex = LOCATIONS.length - 1;
+
+      calculateFare();
+    }
+
+    // VEHICLE SELECTOR HANDLER
+    function setVehicle(vType) {
+      currentVehicle = vType;
+      document.querySelectorAll('.vehicle-btn').forEach(btn => {
+        if (btn.dataset.vehicle === vType) {
+          btn.className = "vehicle-btn border-2 border-coop-600 bg-coop-50 text-coop-900 rounded-2xl p-3 flex flex-col items-center justify-center gap-1 text-center transition hover:border-coop-600 shadow-sm";
+          btn.querySelector('i').className = btn.querySelector('i').className.replace('text-slate-600', 'text-coop-700');
+        } else {
+          btn.className = "vehicle-btn border-2 border-slate-200 bg-slate-50 text-slate-700 rounded-2xl p-3 flex flex-col items-center justify-center gap-1 text-center transition hover:border-coop-400";
+          btn.querySelector('i').className = btn.querySelector('i').className.replace('text-coop-700', 'text-slate-600');
+        }
+      });
+      calculateFare();
+    }
+
+    // PASSENGER TYPE SELECTOR HANDLER
+    function setPassengerType(pType) {
+      currentPassengerType = pType;
+      document.querySelectorAll('.ptype-btn').forEach(btn => {
+        if (btn.dataset.ptype === pType) {
+          btn.className = "ptype-btn border-2 border-coop-600 bg-coop-50 text-coop-900 rounded-xl p-2.5 text-xs font-semibold text-center transition shadow-sm";
+        } else {
+          btn.className = "ptype-btn border-2 border-slate-200 bg-slate-50 text-slate-700 rounded-xl p-2.5 text-xs font-semibold text-center transition";
+        }
+      });
+      calculateFare();
+    }
+
+    // SWAP ORIGIN AND DESTINATION
+    function swapLocations() {
+      const originSelect = document.getElementById('originSelect');
+      const destSelect = document.getElementById('destinationSelect');
+      const temp = originSelect.value;
+      originSelect.value = destSelect.value;
+      destSelect.value = temp;
+      calculateFare();
+    }
+
+    // CORE FARE CALCULATION ENGINE
+    function calculateFare() {
+      const originId = document.getElementById('originSelect').value;
+      const destId = document.getElementById('destinationSelect').value;
+
+      const originObj = LOCATIONS.find(l => l.id === originId);
+      const destObj = LOCATIONS.find(l => l.id === destId);
+
+      if (!originObj || !destObj) return;
+
+      // Distance Calculation
+      const distanceKm = Math.abs(destObj.km - originObj.km);
+
+      const rateConfig = FARE_RATES[currentVehicle];
+      let baseFare = rateConfig.baseFare;
+      let distanceRate = 0;
+
+      if (distanceKm > rateConfig.baseKm) {
+        const extraKm = distanceKm - rateConfig.baseKm;
+        distanceRate = extraKm * rateConfig.ratePerKm;
+      }
+
+      // If origin == dest, set 0
+      let totalGross = distanceKm === 0 ? 0 : baseFare + distanceRate;
+
+      // Discount calculation (20% for Student, Senior, PWD)
+      const isDiscounted = currentPassengerType !== 'regular';
+      let discountAmount = 0;
+
+      if (isDiscounted && totalGross > 0) {
+        discountAmount = totalGross * 0.20;
+      }
+
+      let finalFare = Math.max(0, totalGross - discountAmount);
+
+      // Estimated Time in Minutes
+      let travelTimeMin = Math.round((distanceKm / rateConfig.avgSpeedKmh) * 60) + 2;
+      if (distanceKm === 0) travelTimeMin = 0;
+
+      // Update UI Elements
+      document.getElementById('displayFare').innerText = `₱${finalFare.toFixed(2)}`;
+      document.getElementById('displayDistance').innerText = `${distanceKm.toFixed(1)} km`;
+      document.getElementById('displayTime').innerText = `~${travelTimeMin} min`;
+
+      document.getElementById('displayBaseFare').innerText = `₱${baseFare.toFixed(2)}`;
+      document.getElementById('displayDistanceRate').innerText = `₱${distanceRate.toFixed(2)}`;
+      document.getElementById('displayDiscountAmount').innerText = `-₱${discountAmount.toFixed(2)}`;
+
+      const badge = document.getElementById('discountBadge');
+      if (isDiscounted && distanceKm > 0) {
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+    }
+
+    // RENDER FARE MATRIX TABLE
+    function renderMatrixTable() {
+      const vFilter = document.getElementById('matrixVehicleFilter').value;
+      const tbody = document.getElementById('matrixTableBody');
+      const rateConfig = FARE_RATES[vFilter];
+
+      tbody.innerHTML = '';
+
+      // Generate pairs from Malayog (Origin) to all succeeding barangays
+      const origin = LOCATIONS[0]; // Malayog
+
+      for (let i = 1; i < LOCATIONS.length; i++) {
+        const dest = LOCATIONS[i];
+        const dist = Math.abs(dest.km - origin.km);
+
+        let baseFare = rateConfig.baseFare;
+        let distanceRate = 0;
+        if (dist > rateConfig.baseKm) {
+          distanceRate = (dist - rateConfig.baseKm) * rateConfig.ratePerKm;
+        }
+
+        let regFare = baseFare + distanceRate;
+        let discFare = regFare * 0.80;
+
+        const row = document.createElement('tr');
+        row.className = "hover:bg-slate-50 transition border-b border-slate-100";
+        row.innerHTML = `
+          <td class="p-3.5 pl-6 font-semibold text-slate-800">${origin.name}</td>
+          <td class="p-3.5 font-semibold text-coop-800">${dest.name}</td>
+          <td class="p-3.5 text-slate-500">${dist.toFixed(1)} km</td>
+          <td class="p-3.5 font-bold text-slate-900">₱${regFare.toFixed(2)}</td>
+          <td class="p-3.5 pr-6 font-bold text-emerald-700">₱${discFare.toFixed(2)}</td>
+        `;
+        tbody.appendChild(row);
+      }
+    }
+
+    // FILTER MATRIX BY SEARCH
+    function filterMatrixTable() {
+      const query = document.getElementById('matrixSearch').value.toLowerCase();
+      const rows = document.querySelectorAll('#matrixTableBody tr');
+
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        if (text.includes(query)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    // MODAL CONTROL FUNCTIONS
+    function openVerifyModal() {
+      document.getElementById('verifyModal').classList.remove('hidden');
+    }
+    function closeVerifyModal() {
+      document.getElementById('verifyModal').classList.add('hidden');
+      document.getElementById('verifyResult').classList.add('hidden');
+    }
+
+    function openReportModal() {
+      document.getElementById('reportModal').classList.remove('hidden');
+      document.getElementById('reportSuccess').classList.add('hidden');
+      document.getElementById('reportForm').classList.remove('hidden');
+    }
+    function closeReportModal() {
+      document.getElementById('reportModal').classList.add('hidden');
+    }
+
+    function toggleOfflineModal() {
+      document.getElementById('offlineModal').classList.remove('hidden');
+    }
+    function closeOfflineModal() {
+      document.getElementById('offlineModal').classList.add('hidden');
+    }
+
+    // VERIFY DRIVER FUNCTIONALITY
+    function verifyDriver() {
+      const inputVal = document.getElementById('verifyInput').value.trim().toUpperCase();
+      const resContainer = document.getElementById('verifyResult');
+
+      if (!inputVal) return;
+
+      const matchedDriver = MOCK_DRIVERS.find(d => d.body.includes(inputVal) || d.plate.includes(inputVal));
+
+      resContainer.classList.remove('hidden');
+
+      if (matchedDriver) {
+        resContainer.className = "rounded-2xl p-4 text-xs space-y-2 bg-emerald-50 border-emerald-200 text-emerald-950";
+        resContainer.innerHTML = `
+          <div class="flex items-center justify-between border-b border-emerald-200 pb-2">
+            <span class="font-bold text-emerald-800 text-sm"><i class="fa-solid fa-circle-check text-emerald-600"></i> ${matchedDriver.status}</span>
+            <span class="bg-emerald-200 text-emerald-900 px-2 py-0.5 rounded font-mono font-bold">${matchedDriver.body}</span>
+          </div>
+          <div class="grid grid-cols-2 gap-1 pt-1">
+            <div><strong>Driver:</strong> ${matchedDriver.name}</div>
+            <div><strong>Plaka #:</strong> ${matchedDriver.plate}</div>
+            <div><strong>Sarakyan:</strong> ${matchedDriver.unit}</div>
+            <div><strong>Franchise:</strong> ${matchedDriver.franchise}</div>
+          </div>
+        `;
+      } else {
+        resContainer.className = "rounded-2xl p-4 text-xs space-y-2 bg-amber-50 border-amber-200 text-amber-950";
+        resContainer.innerHTML = `
+          <div class="flex items-center gap-2 font-bold text-amber-800 text-sm">
+            <i class="fa-solid fa-triangle-exclamation text-amber-600"></i> Hindi Nahanap sa Active Registry
+          </div>
+          <p class="text-[11px] text-amber-900">Walang naitalang driver o unit na may Body/Plate #: <strong>${inputVal}</strong>. Pwedeng pansamantalang unverified o hindi miyembro ng Calmoda Coop.</p>
+        `;
+      }
+    }
+
+    // SIMULATE QR CODE SCANNER
+    function simulateQRScan() {
+      const scanBtn = document.getElementById('qrScanBtn');
+      const originalText = scanBtn.innerHTML;
+
+      scanBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>Nagse-scan ng QR Code...</span>`;
+
+      setTimeout(() => {
+        // Pick random driver from mock list
+        const randomDriver = MOCK_DRIVERS[Math.floor(Math.random() * MOCK_DRIVERS.length)];
+        document.getElementById('verifyInput').value = randomDriver.body;
+        scanBtn.innerHTML = originalText;
+        verifyDriver();
+      }, 1200);
+    }
+
+    // SUBMIT REPORT FUNCTIONALITY
+    function submitReport(e) {
+      e.preventDefault();
+      const refCode = "CMD-" + Math.floor(1000 + Math.random() * 9000);
+      
+      document.getElementById('reportRefCode').innerText = refCode;
+      document.getElementById('reportForm').classList.add('hidden');
+      document.getElementById('reportSuccess').classList.remove('hidden');
+
+      // Save report to local Storage list
+      const reportData = {
+        refCode,
+        unit: document.getElementById('reportUnit').value,
+        vehicle: document.getElementById('reportVehicle').value,
+        details: document.getElementById('reportDetails').value,
+        date: new Date().toLocaleString()
+      };
+
+      let currentReports = JSON.parse(localStorage.getItem('calmoda_reports') || '[]');
+      currentReports.push(reportData);
+      localStorage.setItem('calmoda_reports', JSON.stringify(currentReports));
+    }
+
+    function copyRefCode() {
+      const refCode = document.getElementById('reportRefCode').innerText;
+      
+      // Fallback copy execCommand
+      const tempInput = document.createElement('input');
+      tempInput.value = refCode;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempInput);
+
+      alert(`Kina-kopyang Reference Code: ${refCode}`);
+    }
+
+    // LOCAL STORAGE MATRIX SYNC
+    function saveTariffToLocalStorage() {
+      try {
+        localStorage.setItem('calmoda_tariff_locations', JSON.stringify(LOCATIONS));
+        localStorage.setItem('calmoda_tariff_rates', JSON.stringify(FARE_RATES));
+        document.getElementById('offlineStatusBtn').classList.remove('hidden');
+      } catch (err) {
+        console.warn("Local Storage access restricted");
+      }
+    }
+
+    // TICKER SLIDER
+    function nextTickerNotice() {
+      currentTickerIdx = (currentTickerIdx + 1) % TICKER_NOTICES.length;
+      const tickerElem = document.getElementById('tickerText');
+      tickerElem.style.opacity = '0';
+      setTimeout(() => {
+        tickerElem.innerText = TICKER_NOTICES[currentTickerIdx];
+        tickerElem.style.opacity = '1';
+      }, 200);
+    }
+
+    // DOWNLOAD SUMMARY TEXT
+    function downloadTariffSummary() {
+      let textContent = "CALMODA COOP - CALBAYOG OFFICIAL FARE MATRIX\n";
+      textContent += "Route: Brgy. Malayog to Calbayog City Proper\n\n";
+      
+      LOCATIONS.forEach(loc => {
+        textContent += `- ${loc.name} (${loc.km} km from Malayog)\n`;
+      });
+
+      textContent += "\nBase Fares:\n";
+      textContent += `- Tricycle: ₱${FARE_RATES.tricycle.baseFare} base (first ${FARE_RATES.tricycle.baseKm}km), +₱${FARE_RATES.tricycle.ratePerKm}/km\n`;
+      textContent += `- Multicab PUJ: ₱${FARE_RATES.puj.baseFare} base (first ${FARE_RATES.puj.baseKm}km), +₱${FARE_RATES.puj.ratePerKm}/km\n`;
+      textContent += `- Habal-Habal: ₱${FARE_RATES.habal.baseFare} base (first ${FARE_RATES.habal.baseKm}km), +₱${FARE_RATES.habal.ratePerKm}/km\n`;
+
+      const blob = new Blob([textContent], { type: 'text/plain' });
+      const anchor = document.createElement('a');
+      anchor.href = URL.createObjectURL(blob);
+      anchor.download = 'Calmoda_Fare_Summary.txt';
+      anchor.click();
+    }
+  </script>
+
+</body>
+</html>
